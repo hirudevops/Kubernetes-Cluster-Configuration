@@ -24,6 +24,10 @@
    
     free -m
 
+# Disable Firewall
+   
+   sudo ufw disable
+
 # Remove existing version of docker (if exists) If not exit Please Ignore this step #
 
     sudo apt-get remove -y docker docker-engine docker.io containerd runc
