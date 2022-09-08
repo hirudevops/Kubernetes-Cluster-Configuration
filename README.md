@@ -1,6 +1,11 @@
 # Kubernetes-Cluster-Configuration
 # Kubernetes Cluster Master-and-Worker Node on Ubuntu-20.4 #
 # Describe Kubernetes Cluster Master and Worker Node, First off all we create a Three VM instances, One for Master Node and Two Worker Node #
+# Prerequisite
+    *SWAPOFF
+    *Firewalld-OFF
+    *HOSTFILE-ENTRY
+    
 
 # Update Host Machine*
 
