@@ -1,33 +1,49 @@
 # Kubernetes-Cluster-Configuration
 # Kubernetes Cluster Master-and-Worker Node on Ubuntu-20.4 #
-# Describe Kubernetes Cluster Master and Worker Node, First off all we create a Two ec2 instances One for Master Node and One [1] Worker Node #
+# Describe Kubernetes Cluster Master and Worker Node, First off all we create a Three VM instances, One for Master Node and Two Worker Node #
 
-# Update ec2 Machine*
+# Update Host Machine*
 
     apt-get update -y
 
 # Set Hostname your Host Machine *
 
-    sudo hostnamectl set-hostname kubernetes-master
+    sudo hostnamectl set-hostname kmaster
 
 # Disable Swap Memory #
 
     swapoff -a
+    sed -i '/swap/s/^/#/g' /etc/fstab
    
 # Check It's Disable or not #
    
     free -m
-   
+
+# Remove existing version of docker (if exists) If not exit Please Ignore this step #
+
+    sudo apt-get remove -y docker docker-engine docker.io containerd runc
+
 # Install Docker Engine on your Host Machine #  
 
-    apt install docker -y
-    apt install docker.io -y
+    sudo apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update -y
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    
   
-# Added a jason file in Docker Directory # vi /etc/docker/daemon.json
+# Configuring the container runtime cgroup driver to systemd # vi /etc/docker/daemon.json
 
-{
-"exec-opts": ["native.cgroupdriver=systemd"]
-}
+    {
+    "exec-opts": ["native.cgroupdriver=systemd"]
+    }
 
 # Reload Deamon #
 
@@ -43,19 +59,19 @@
 
 # Now Install Kubernetes
 
-    sudo apt install apt-transport-https curl
-    
-    curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
-    
-    sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-    
-    sudo apt install -y kubeadm kubelet kubectl kubernetes-cni
+    sudo apt-get update -y
+    sudo apt-get install -y apt-transport-https ca-certificates curl
+    sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee                          /etc/apt/sources.list.d/kubernetes.list
+    sudo apt-get update -y
+    sudo apt-get install -y kubelet kubeadm kubectl
+    sudo apt-mark hold kubelet kubeadm kubectl
 
 # Enable Kubelet
 
     systemctl enable kubelet
   
-# Note: This Step Follow All Two Machine, Master and WorkerNode1 #
+# Note: This Step Follow All Cluster Machine, Master and WorkerNode #
 
 
 
@@ -86,9 +102,6 @@ kubeadm join 192.168.2.121:6443 --token p8r1a2.msnjnqjh36ft443w \
 # Check Node Ready or Not Ready #
 
     kubectl get node
-  
-  
-
 
 # Deploy Nginx in kubernetes #
 
