@@ -51,7 +51,7 @@
 
 # Start and Enable Docker Engine #
 
-    systemctl start docker && systemctl enable docker
+    systemctl restart docker && systemctl enable docker
 
 # Check Status Docker Service #
 
