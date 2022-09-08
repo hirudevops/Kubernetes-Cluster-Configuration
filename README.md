@@ -25,8 +25,8 @@
     free -m
 
 # Disable Firewall
-   
-   sudo ufw disable
+
+    sudo ufw disable
 
 # Remove existing version of docker (if exists) If not exit Please Ignore this step #
 
